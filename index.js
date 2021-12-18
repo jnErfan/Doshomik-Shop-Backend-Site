@@ -63,5 +63,19 @@ client.connect((err) => {
   });
 
   //Get All User
+  app.get("/allUsers", async (req, res) => {
+    const users = await usersCollection.find({}).toArray();
+    res.send(users);
+  });
+
+  //Make Admin
+  app.put("/makeAdmin", async (req, res) => {
+    const adminEmail = req;
+    console.log(adminEmail);
+    /* const query = { email: adminEmail };
+    const updateDoc = { $set: { position: "Admin" } };
+    const result = await usersCollection.updateOne(query, updateDoc);
+    res.json(result); */
+  });
 });
 app.listen(port, () => console.log("Server Running At Port", port));
