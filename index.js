@@ -50,7 +50,7 @@ client.connect((err) => {
     console.log(result);
   });
 
-  // Google Facebook Github User Information
+  // Google Facebook And Github User Information
   app.put("/users", async (req, res) => {
     const user = req.body;
     console.log(user);
