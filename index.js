@@ -3,11 +3,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
+const ObjectId = require("mongodb").ObjectId;
 const fileUpload = require("express-fileupload");
 require("dotenv").config();
 
 app.use(cors());
-app.use(express());
+app.use(express.json());
 app.use(fileUpload());
 
 app.get("/", (req, res) => {
@@ -23,7 +24,51 @@ const client = new MongoClient(uri, {
 client.connect((err) => {
   const database = client.db("doshomik_shop");
   const usersCollection = database.collection("users");
+  const membershipCollection = database.collection("memberships");
 
-  console.log("Connected");
+  app.get("/memberShips", async (req, res) => {
+    const membership = await membershipCollection.find({}).limit(6).toArray();
+    res.send(membership);
+  });
+  app.get("/allMemberShips", async (req, res) => {
+    const membership = await membershipCollection.find({}).toArray();
+    res.send(membership);
+  });
+
+  app.get("/memberShips/:id", async (req, res) => {
+    const params = req.params.id;
+    const query = { _id: ObjectId(params) };
+    const result = await membershipCollection.find(query).toArray();
+    res.send(result);
+  });
+
+  // Create Email Password Information
+  app.post("/users", async (req, res) => {
+    const user = req.body;
+    const result = await usersCollection.insertOne(user);
+    res.json(result);
+    console.log(result);
+  });
+
+  // Google Facebook Github Information
+  app.put("/users", async (req, res) => {
+    const user = req.body;
+    console.log(user);
+    const query = { email: user?.email };
+    const options = { upsert: true };
+    const updateDoc = { $set: user };
+    const result = await usersCollection.updateOne(query, updateDoc, options);
+    res.json(result);
+    console.log(result);
+  });
+
+  // Get All Users
+  app.get("/users/:email", async (req, res) => {
+    const params = req.params.email;
+    const query = { email: params };
+    const result = await usersCollection.find(query).toArray();
+    res.send(result);
+    console.log(result);
+  });
 });
 app.listen(port, () => console.log("Server Running At Port", port));
