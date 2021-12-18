@@ -61,5 +61,7 @@ client.connect((err) => {
     res.json(result);
     console.log(result);
   });
+
+  //Get All User
 });
 app.listen(port, () => console.log("Server Running At Port", port));
