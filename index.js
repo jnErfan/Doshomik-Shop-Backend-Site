@@ -61,14 +61,5 @@ client.connect((err) => {
     res.json(result);
     console.log(result);
   });
-
-  // Get All Users
-  app.get("/users/:email", async (req, res) => {
-    const params = req.params.email;
-    const query = { email: params };
-    const result = await usersCollection.find(query).toArray();
-    res.send(result);
-    console.log(result);
-  });
 });
 app.listen(port, () => console.log("Server Running At Port", port));
