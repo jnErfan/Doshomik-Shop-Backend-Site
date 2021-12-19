@@ -25,6 +25,7 @@ client.connect((err) => {
   const database = client.db("doshomik_shop");
   const usersCollection = database.collection("users");
   const membershipCollection = database.collection("memberships");
+  const orderMembershipCollection = database.collection("orderMemberships");
 
   app.get("/memberShips", async (req, res) => {
     const membership = await membershipCollection.find({}).limit(6).toArray();
@@ -68,14 +69,66 @@ client.connect((err) => {
     res.send(users);
   });
 
+  // Get One Users
+  app.get("/users/:email", async (req, res) => {
+    const params = req.params.email;
+    const query = { email: params };
+    const result = await usersCollection.find(query).toArray();
+    res.send(result);
+  });
+
   //Make Admin
-  app.put("/makeAdmin", async (req, res) => {
-    const adminEmail = req;
-    console.log(adminEmail);
-    /* const query = { email: adminEmail };
+  app.put("/makeAdmin/:email", async (req, res) => {
+    const adminEmail = req.params.email;
+    const query = { email: adminEmail };
     const updateDoc = { $set: { position: "Admin" } };
     const result = await usersCollection.updateOne(query, updateDoc);
-    res.json(result); */
+    res.json(result);
+  });
+  //Make Moderator
+  app.put("/makeModerator/:email", async (req, res) => {
+    const adminEmail = req.params.email;
+    const query = { email: adminEmail };
+    const updateDoc = { $set: { position: "Moderator" } };
+    const result = await usersCollection.updateOne(query, updateDoc);
+    res.json(result);
+  });
+  //Make User
+  app.put("/makeUser/:email", async (req, res) => {
+    const adminEmail = req.params.email;
+    const query = { email: adminEmail };
+    const updateDoc = { $set: { position: "User" } };
+    const result = await usersCollection.updateOne(query, updateDoc);
+    res.json(result);
+  });
+
+  // Membership Orders Stored
+  app.post("/membershipOrder", async (req, res) => {
+    const user = req.body;
+    const result = await orderMembershipCollection.insertOne(user);
+    res.json(result);
+    console.log(result);
+  });
+
+  app.get("/membershipOrder", async (req, res) => {
+    const users = await orderMembershipCollection.find({}).toArray();
+    res.send(users);
+  });
+
+  // Find Customer Ordered
+  app.get("/myOrder/:email", async (req, res) => {
+    const emailMatch = req.params.email;
+    const query = { email: emailMatch };
+    const result = await orderMembershipCollection.find(query).toArray();
+    res.send(result);
+  });
+
+  // Cancel Order
+  app.delete("/deleteOrder/:Id", async (req, res) => {
+    const id = req.params.Id;
+    const query = { _id: ObjectId(id) };
+    const result = await orderMembershipCollection.deleteOne(query);
+    res.send(result);
   });
 });
 app.listen(port, () => console.log("Server Running At Port", port));
