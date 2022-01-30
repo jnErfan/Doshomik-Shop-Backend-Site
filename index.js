@@ -26,11 +26,13 @@ client.connect((err) => {
   const usersCollection = database.collection("users");
   const membershipCollection = database.collection("memberships");
   const orderMembershipCollection = database.collection("orderMemberships");
+  const customerReviewCollection = database.collection("customerReview");
 
   app.get("/memberShips", async (req, res) => {
     const membership = await membershipCollection.find({}).limit(6).toArray();
     res.send(membership);
   });
+
   app.get("/allMemberShips", async (req, res) => {
     const membership = await membershipCollection.find({}).toArray();
     res.send(membership);
@@ -128,6 +130,60 @@ client.connect((err) => {
     const id = req.params.Id;
     const query = { _id: ObjectId(id) };
     const result = await orderMembershipCollection.deleteOne(query);
+    res.send(result);
+  });
+
+  // Placed Order Status
+  app.put("/statusUpdate/:id", async (req, res) => {
+    const id = req.params.id;
+    const updateStatus = req.body;
+    const query = { _id: ObjectId(id) };
+    let updateDoc;
+    if (updateStatus.reason) {
+      updateDoc = {
+        $set: { status: updateStatus.status, reason: updateStatus.reason },
+      };
+    } else {
+      updateDoc = { $set: { status: updateStatus.status } };
+    }
+    const result = await orderMembershipCollection.updateOne(query, updateDoc);
+    res.json(result);
+  });
+
+  // Customer Review Post
+  app.post("/customerReview", async (req, res) => {
+    const review = req.body;
+    const result = await customerReviewCollection.insertOne(review);
+    res.json(result);
+    console.log(result);
+  });
+
+  // Manage All Customer Review
+  app.get("/customerReview", async (req, res) => {
+    const review = await customerReviewCollection.find({}).toArray();
+    res.send(review);
+  });
+
+  // Find Customer Review
+  app.get("/customerReview/:email", async (req, res) => {
+    const emailMatch = req.params.email;
+    const query = { email: emailMatch };
+    const result = await customerReviewCollection.find(query).toArray();
+    res.send(result);
+  });
+
+  // Add Memberships
+  app.post("/addMembership", async (req, res) => {
+    const service = req.body;
+    const result = await membershipCollection.insertOne(service);
+    res.send(result);
+  });
+
+  // Delete Membership
+  app.delete("/deleteMembership/:Id", async (req, res) => {
+    const id = req.params.Id;
+    const query = { _id: ObjectId(id) };
+    const result = await membershipCollection.deleteOne(query);
     res.send(result);
   });
 });
