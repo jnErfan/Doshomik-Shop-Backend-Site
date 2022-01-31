@@ -50,19 +50,16 @@ client.connect((err) => {
     const user = req.body;
     const result = await usersCollection.insertOne(user);
     res.json(result);
-    console.log(result);
   });
 
   // Google Facebook And Github User Information
   app.put("/users", async (req, res) => {
     const user = req.body;
-    console.log(user);
     const query = { email: user?.email };
     const options = { upsert: true };
     const updateDoc = { $set: user };
     const result = await usersCollection.updateOne(query, updateDoc, options);
     res.json(result);
-    console.log(result);
   });
 
   //Get All User
@@ -109,7 +106,6 @@ client.connect((err) => {
     const user = req.body;
     const result = await orderMembershipCollection.insertOne(user);
     res.json(result);
-    console.log(result);
   });
 
   app.get("/membershipOrder", async (req, res) => {
@@ -155,7 +151,6 @@ client.connect((err) => {
     const review = req.body;
     const result = await customerReviewCollection.insertOne(review);
     res.json(result);
-    console.log(result);
   });
 
   // Manage All Customer Review
@@ -185,6 +180,27 @@ client.connect((err) => {
     const query = { _id: ObjectId(id) };
     const result = await membershipCollection.deleteOne(query);
     res.send(result);
+  });
+
+  // Find Membership With Id
+  app.get("/membership/:id", async (req, res) => {
+    const idMatch = req.params.id;
+    const query = { _id: ObjectId(idMatch) };
+    const result = await membershipCollection.find(query).toArray();
+    res.send(result);
+  });
+
+  // Update All Membership
+  app.put("/updateMembership/:id", async (req, res) => {
+    const updateId = req.params.id;
+    const updateInfo = req.body;
+    const collectionId = { _id: ObjectId(updateId) };
+    const updateDoc = { $set: updateInfo };
+    const result = await membershipCollection.updateOne(
+      collectionId,
+      updateDoc
+    );
+    res.json(result);
   });
 });
 app.listen(port, () => console.log("Server Running At Port", port));
