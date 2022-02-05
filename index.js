@@ -28,16 +28,19 @@ client.connect((err) => {
   const orderMembershipCollection = database.collection("orderMemberships");
   const customerReviewCollection = database.collection("customerReview");
 
+  // Get Only 6 Membership For Home
   app.get("/memberShips", async (req, res) => {
     const membership = await membershipCollection.find({}).limit(6).toArray();
     res.send(membership);
   });
 
+  //  Get All Memberships
   app.get("/allMemberShips", async (req, res) => {
     const membership = await membershipCollection.find({}).toArray();
     res.send(membership);
   });
 
+  // Find Membership With Id
   app.get("/memberShips/:id", async (req, res) => {
     const params = req.params.id;
     const query = { _id: ObjectId(params) };
